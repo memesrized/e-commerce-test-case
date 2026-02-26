@@ -1,0 +1,8 @@
+- similarity search for exact keywords in filters 
+- reranking results based on multiple search engine results
+- guardrails for inappropriate oputput with stopwords
+- instead of agent with tools this should be
+    - graph of steps with parallel search calls
+- instead of chat ui this hsould be rest api FastAPI serving app
+    - input is NLQ
+    - output is list of products with explanation, why this 
