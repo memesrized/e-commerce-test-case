@@ -11,6 +11,7 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph.state import CompiledStateGraph
 
 from .context import ContextProvider, StaticContextProvider
+from .guardrails import GUARDRAIL_PROMPT
 
 # ---------------------------------------------------------------------------
 # System prompt template
@@ -19,6 +20,7 @@ from .context import ContextProvider, StaticContextProvider
 _SYSTEM_PROMPT_TEMPLATE = """\
 You are a helpful and discreet shopping assistant for a luxury adult e-commerce platform.
 {catalog_context}
+{guardrails}
 IMPORTANT — HOW TO SEARCH:
 - NEVER pass the customer's exact words as the "query" argument to a tool
 - Rephrase into a product-feature query describing attributes, benefits, or use cases
@@ -63,7 +65,8 @@ def create_agent(
         context_provider = StaticContextProvider()
 
     system_prompt = _SYSTEM_PROMPT_TEMPLATE.format(
-        catalog_context=context_provider.get_context()
+        catalog_context=context_provider.get_context(),
+        guardrails=GUARDRAIL_PROMPT,
     )
 
     llm = ChatOpenAI(model=model, temperature=temperature)

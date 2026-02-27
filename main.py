@@ -27,11 +27,16 @@ def run_chatbot() -> None:
     from src.search import ProductIndex
     from src.tools import create_search_tools
     from src.agent import create_agent
+    from src.context import DatasetContextProvider
+    from src.guardrails import check_response, check_input
 
     print("Building product search index (may take a moment on first run)…")
     index = ProductIndex.from_file(DATA_FILE)
+    context_provider = DatasetContextProvider(index.products)
 
-    graph = create_agent(create_search_tools(index))
+    graph = create_agent(
+        create_search_tools(index), context_provider=context_provider
+    )
 
     # Each session gets a unique thread_id so LangGraph's MemorySaver
     # keeps conversation history isolated.
@@ -54,11 +59,17 @@ def run_chatbot() -> None:
             print("Goodbye!")
             break
 
+        if not check_input(user_input):
+            print("\nAssistant: I'd be happy to help you find products. "
+                  "Could you rephrase your request?\n")
+            continue
+
         result = graph.invoke(
             {"messages": [{"role": "user", "content": user_input}]},
             config=config,
         )
         response: str = result["messages"][-1].content
+        _, response = check_response(response)
         print(f"\nAssistant: {response}\n")
 
 

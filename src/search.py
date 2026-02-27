@@ -70,6 +70,11 @@ class ProductIndex:
         self._bm25 = bm25s.BM25()
         self._bm25.index(corpus_tokens)
 
+    @property
+    def products(self) -> list[dict]:
+        """The underlying product catalog."""
+        return self._products
+
     @classmethod
     def from_file(cls, path: str | Path, model_name: str = DEFAULT_MODEL) -> "ProductIndex":
         """Load products from a JSON file and build the index.
